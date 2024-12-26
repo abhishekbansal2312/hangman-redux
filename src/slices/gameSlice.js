@@ -51,11 +51,14 @@ const gameSlice = createSlice({
       } else {
         const wordArray = currentQuestion.word.split("");
         const guessedLetters = new Set(state.guesses);
-        const allLettersGuessed = wordArray.every((letter) =>
-          guessedLetters.has(letter)
-        );
-
-        if (allLettersGuessed) {
+        let isWordGuessed = true;
+        for (let i = 0; i < wordArray.length; i++) {
+          if (!guessedLetters.has(wordArray[i])) {
+            isWordGuessed = false;
+            break;
+          }
+        }
+        if (isWordGuessed) {
           state.score += 1;
           state.guesses = [];
           state.currentQuestionIndex = Math.floor(Math.random() * data.length);

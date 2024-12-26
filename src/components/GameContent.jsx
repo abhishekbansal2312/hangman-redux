@@ -1,15 +1,59 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import WordDisplay from "./WordDisplay";
 import AlphabetBar from "./AlphabetBar";
 import { capitiliser } from "../utils";
+import { resetGame } from "../slices/gameSlice";
 
-export default function GameContent({ onReset }) {
+const Category = () => {
+  const category = useSelector(
+    (state) => state.game.questions[state.game.currentQuestionIndex].category
+  );
+  return (
+    <div className="text-lg font-medium text-gray-200 text-center capitalize mt-2">
+      <span className="bg-slate-600 p-2 rounded-md">
+        Theme:
+        {capitiliser(category)}
+      </span>
+    </div>
+  );
+};
+
+const Score = () => {
+  const score = useSelector((state) => state.game.score);
+  return (
+    <div className="text-lg font-medium text-gray-200 text-center mt-2 bg-slate-800 px-2 rounded-lg py-1">
+      Score: {score}
+    </div>
+  );
+};
+
+const AttemptLeft = () => {
+  const attemptsLeft = useSelector((state) => state.game.attempts);
+  return (
+    <div className="text-lg font-medium text-gray-200 text-center mt-2 bg-slate-800  rounded-lg px-2 py-1">
+      Tries Left: {attemptsLeft}
+    </div>
+  );
+};
+const ResetGame = () => {
+  const dispatch = useDispatch();
+  return (
+    <div className="text-lg font-medium  text-center mt-2 bg-red-300 p-1 rounded-lg px-2 py-1">
+      <button
+        onClick={() => dispatch(resetGame())}
+        className="btn btn-secondary"
+      >
+        Reset Game
+      </button>
+    </div>
+  );
+};
+
+export default function GameContent() {
   const question = useSelector(
     (state) => state.game.questions[state.game.currentQuestionIndex]
   );
-  const score = useSelector((state) => state.game.score);
-  const attemptsLeft = useSelector((state) => state.game.attempts);
 
   return (
     <div className="game-info flex flex-col justify-between h-full">
@@ -17,33 +61,15 @@ export default function GameContent({ onReset }) {
         <WordDisplay word={question.word} />
       </div>
 
-      <div className="text-lg font-medium text-gray-200 text-center my-2">
+      <div className="text-lg font-medium text-gray-200 text-center my-2 max-w-xl">
         {question.hint}
       </div>
-      <div className="text-lg font-medium text-gray-200 text-center capitalize mt-2">
-        <span className="bg-slate-600 p-2 rounded-md">
-          Theme:{" "}
-          {useSelector((state) =>
-            capitiliser(
-              state.game.questions[state.game.currentQuestionIndex].category
-            )
-          )}
-        </span>
-      </div>
-      {useSelector((state) => state.game.isGameStarted) && (
-        <div className="text-lg font-medium text-gray-200 text-center mt-2">
-          <button onClick={onReset} className="btn btn-secondary">
-            Reset Game
-          </button>
-        </div>
-      )}
+      <Category />
+
       <div className="flex items-center justify-center gap-5 mt-3">
-        <div className="text-lg font-medium text-gray-200 text-center mt-2 bg-slate-800 p-2 rounded-lg">
-          Score: {score}
-        </div>
-        <div className="text-lg font-medium text-gray-200 text-center mt-2 bg-slate-800 p-1 rounded-lg">
-          Tries Left: {attemptsLeft}
-        </div>
+        <Score />
+        <AttemptLeft />
+        <ResetGame />
       </div>
       <AlphabetBar />
     </div>
