@@ -1,3 +1,4 @@
+// gameSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import data from "../data/questions";
 
@@ -27,12 +28,6 @@ const gameSlice = createSlice({
     increaseScore(state) {
       state.score += 1;
     },
-    decreaseAttempts(state) {
-      state.attempts -= 1;
-      if (state.attempts === 0) {
-        state.isGameStarted = false;
-      }
-    },
     resetGame(state) {
       state.score = 0;
       state.attempts = 7;
@@ -48,6 +43,8 @@ const gameSlice = createSlice({
       const currentQuestion = state.questions[state.currentQuestionIndex];
       if (!currentQuestion.word.includes(guess)) {
         state.wrongGuesses++;
+        state.attempts -= 1;
+
         if (state.wrongGuesses >= state.attempts) {
           state.isGameStarted = false;
         }
@@ -60,9 +57,7 @@ const gameSlice = createSlice({
 
         if (allLettersGuessed) {
           state.score += 1;
-
           state.guesses = [];
-
           state.currentQuestionIndex = Math.floor(Math.random() * data.length);
         }
       }
@@ -75,7 +70,6 @@ export const {
   endGame,
   nextQuestion,
   increaseScore,
-  decreaseAttempts,
   resetGame,
   checkGuess,
 } = gameSlice.actions;

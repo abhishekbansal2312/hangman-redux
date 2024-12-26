@@ -1,3 +1,4 @@
+// AlphabetBar.jsx
 import React from "react";
 import { alphabets } from "../utils/index";
 import { useDispatch, useSelector } from "react-redux";
