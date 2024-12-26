@@ -1,21 +1,19 @@
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
 
 export const Canvas = ({
   count,
-  color = "#363636",
+  color = "white",
   size = { width: 288, height: 388 },
+  interactive = false, // Add interactive prop
 }) => {
-  const draw = {
-    hidden: { pathLength: 0, opacity: 0 },
-    visible: {
-      pathLength: 1,
-      opacity: 1,
-      transition: {
-        pathLength: { type: "spring", duration: 1 },
-        opacity: { duration: 0.2 },
-      },
-    },
-  };
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (count > 0 && interactive) {
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 1000); // Animate for 1 second
+    }
+  }, [count, interactive]);
 
   const lines = [
     { condition: count > 0, x1: 50, y1: 0, x2: 52, y2: 100 }, // Rope
@@ -26,52 +24,46 @@ export const Canvas = ({
     { condition: count > 6, x1: 51, y1: 210, x2: 36, y2: 246 }, // Left Leg
   ];
 
+  const svgStyle = {
+    width: size.width,
+    height: size.height,
+    stroke: color,
+    strokeWidth: interactive ? 5 : 2, // Thicker stroke on interaction
+    strokeLinecap: "round", // Rounded line caps for smoother look
+    fill: "none", // Avoid unnecessary fill
+  };
+
   return (
-    <motion.svg
-      width={size.width}
-      height={size.height}
-      viewBox={`0 0 ${size.width} ${size.height}`}
-      initial="hidden"
-      animate="visible"
-    >
+    <svg viewBox={`0 0 ${size.width} ${size.height}`} style={svgStyle}>
       {/* Stage */}
-      <motion.line x1="2" y1="385" x2="286" y2="385" stroke={color} />
-
+      <line x1="2" y1="385" x2="286" y2="385" />
       {/* Pole */}
-      <motion.line
-        x1="200"
-        y1="0"
-        x2="200"
-        y2="385"
-        stroke={color}
-        strokeWidth={5}
-      />
-
+      <line x1="200" y1="0" x2="200" y2="385" />
       {/* Top */}
-      <motion.line x1="50" y1="2" x2="200" y2="2" stroke={color} />
-
+      <line x1="50" y1="2" x2="200" y2="2" />
       {/* Rib */}
-      <motion.line x1="160" y1="0" x2="200" y2="40" stroke={color} />
-
+      <line x1="160" y1="0" x2="200" y2="40" />
       {/* Conditional elements */}
       {lines.map((line, index) =>
         line.condition ? (
-          <motion.line
+          <line
             key={index}
             x1={line.x1}
             y1={line.y1}
             x2={line.x2}
             y2={line.y2}
-            stroke={color}
-            variants={draw}
           />
         ) : null
       )}
-
-      {/* Head */}
+      {/* Head (conditionally bold on animation) */}
       {count > 1 && (
-        <motion.circle cx="52" cy="122" r="20" stroke={color} variants={draw} />
+        <circle
+          cx="52"
+          cy="122"
+          r="20"
+          style={{ strokeWidth: isAnimating ? 4 : 2 }} // Bold head during animation
+        />
       )}
-    </motion.svg>
+    </svg>
   );
 };
