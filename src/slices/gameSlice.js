@@ -25,7 +25,7 @@ const gameSlice = createSlice({
       state.questionsAsked = 1;
     },
     nextQuestion(state) {
-      if (state.questionsAsked >= state.questions.length) {
+      if (state.questionsAsked >= 10) {
         state.attempts = 0;
         return;
       }
@@ -81,7 +81,7 @@ const gameSlice = createSlice({
           state.guesses = [];
           state.wrongGuesses = 0;
 
-          if (state.questionsAsked < state.questions.length) {
+          if (state.questionsAsked < 10) {
             let nextIndex;
             do {
               nextIndex = Math.floor(Math.random() * state.questions.length);
