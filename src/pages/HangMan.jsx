@@ -7,13 +7,14 @@ import { Canvas } from "../components/Canvas";
 export default function HangmanGame() {
   const attemptsLeft = useSelector((state) => state.game.attempts);
   const wrongGuesses = useSelector((state) => state.game.wrongGuesses);
+  const isGameStarted = useSelector((state) => state.game.isGameStarted);
   console.log(attemptsLeft);
 
   return (
     <div className="hangman-container flex flex-col justify-center items-center h-screen bg-gray-900">
       <Header title="HangMan" />
       <div className="game-content flex flex-row justify-center items-start space-x-28">
-        {attemptsLeft !== 0 && (
+        {isGameStarted && attemptsLeft !== 0 && (
           <div className="canvas-wrapper pt-16">
             <Canvas count={wrongGuesses} />
           </div>
