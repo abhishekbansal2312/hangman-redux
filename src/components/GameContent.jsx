@@ -108,7 +108,7 @@ export default function GameContent() {
               onClick={handleNextQuestion}
               className="bg-green-500 text-white px-4 py-2 rounded-lg"
             >
-              Next Question
+              {questionsAsked == 10 ? "Finish Game" : "Next Question"}
             </button>
           </div>
           <>
