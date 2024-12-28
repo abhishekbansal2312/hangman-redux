@@ -1,4 +1,3 @@
-// gameSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import data from "../data/questions";
 
@@ -6,24 +5,42 @@ const gameSlice = createSlice({
   name: "game",
   initialState: {
     questions: data,
-    currentQuestionIndex: Math.floor(Math.random() * data.length),
+    currentQuestionIndex: null,
     score: 0,
     isGameStarted: false,
     attempts: 7,
     guesses: [],
     wrongGuesses: 0,
+    usedQuestions: [],
+    questionsAsked: 0,
   },
   reducers: {
     startGame(state) {
       state.isGameStarted = true;
-    },
-    endGame(state) {
-      state.isGameStarted = false;
+
+      let firstIndex = Math.floor(Math.random() * state.questions.length);
+      state.currentQuestionIndex = firstIndex;
+
+      state.usedQuestions.push(firstIndex);
+      state.questionsAsked = 1;
     },
     nextQuestion(state) {
-      state.currentQuestionIndex = Math.floor(Math.random() * data.length);
+      if (state.questionsAsked >= state.questions.length) {
+        state.attempts = 0;
+        return;
+      }
+
+      let nextIndex;
+      do {
+        nextIndex = Math.floor(Math.random() * state.questions.length);
+        console.log(nextIndex);
+      } while (state.usedQuestions.includes(nextIndex));
+
+      state.currentQuestionIndex = nextIndex;
+      state.usedQuestions.push(nextIndex);
       state.guesses = [];
       state.wrongGuesses = 0;
+      state.questionsAsked += 1;
     },
     increaseScore(state) {
       state.score += 1;
@@ -33,47 +50,56 @@ const gameSlice = createSlice({
       state.attempts = 7;
       state.guesses = [];
       state.wrongGuesses = 0;
-      state.currentQuestionIndex = Math.floor(Math.random() * data.length);
+      state.usedQuestions = [];
+      state.questionsAsked = 1;
+      let randomIndex = Math.floor(Math.random() * state.questions.length);
+      state.currentQuestionIndex = randomIndex;
+      state.usedQuestions.push(randomIndex);
     },
     checkGuess(state, action) {
       const { guess } = action.payload;
+
       if (!state.guesses.includes(guess)) {
         state.guesses.push(guess);
       }
+
       const currentQuestion = state.questions[state.currentQuestionIndex];
+
       if (!currentQuestion.word.includes(guess)) {
         state.wrongGuesses++;
         state.attempts -= 1;
-
-        if (state.wrongGuesses >= state.attempts) {
-          state.isGameStarted = false;
-        }
       } else {
         const wordArray = currentQuestion.word.split("");
         const guessedLetters = new Set(state.guesses);
-        let isWordGuessed = true;
-        for (let i = 0; i < wordArray.length; i++) {
-          if (!guessedLetters.has(wordArray[i])) {
-            isWordGuessed = false;
-            break;
-          }
-        }
+
+        const isWordGuessed = wordArray.every((letter) =>
+          guessedLetters.has(letter)
+        );
+
         if (isWordGuessed) {
           state.score += 1;
           state.guesses = [];
-          state.currentQuestionIndex = Math.floor(Math.random() * data.length);
+          state.wrongGuesses = 0;
+
+          if (state.questionsAsked < state.questions.length) {
+            let nextIndex;
+            do {
+              nextIndex = Math.floor(Math.random() * state.questions.length);
+            } while (state.usedQuestions.includes(nextIndex));
+
+            state.currentQuestionIndex = nextIndex;
+            state.usedQuestions.push(nextIndex);
+            state.questionsAsked += 1;
+          } else {
+            state.attempts = 0;
+          }
         }
       }
     },
   },
 });
 
-export const {
-  startGame,
-  endGame,
-  nextQuestion,
-  increaseScore,
-  resetGame,
-  checkGuess,
-} = gameSlice.actions;
+export const { startGame, nextQuestion, increaseScore, resetGame, checkGuess } =
+  gameSlice.actions;
+
 export default gameSlice.reducer;

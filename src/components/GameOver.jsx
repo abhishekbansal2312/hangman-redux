@@ -7,9 +7,6 @@ export default function GameOver({ onReset }) {
   const dispatch = useDispatch();
   return (
     <div className="game-over flex flex-col items-center  bg-gray-700 p-6 min-w-80 rounded-lg shadow-md">
-      <h2 className="text-2xl font-medium text-white text-center mb-4">
-        Game Over
-      </h2>
       <p className="text-lg font-medium text-white text-center">
         Thank you for Playing. Your score is {score}
       </p>
